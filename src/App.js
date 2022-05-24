@@ -1,15 +1,14 @@
 import React, { useState } from "react";
+import ToDoClass from "./Components/ToDoClass";
 import ToDo from "./Components/ToDo";
-import ToDoList from "./Components/ToDoList";
 
 const App = () => {
-  
-    return (
-      <React.Fragment>
-        <ToDoList />
-        {/* <ToDo></ToDo> */}
-      </React.Fragment>
-    );
-}
+  return (
+    <React.Fragment>
+      <ToDo />
+      {/* <ToDoClass></ToDoClass> */}
+    </React.Fragment>
+  );
+};
 
 export default App;

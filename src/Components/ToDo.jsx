@@ -1,64 +1,36 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
+import ToDoList from "./ToDoList";
+import ToDoInput from "./ToDoInput";
 
-class ToDo extends Component {
-  constructor(props) {
-    super(props);
+const ToDo = (props) => {
+  const [inputText, setInputText] = useState("");
+  const [todo, setToDo] = useState([]);
 
-    this.state = {
-      newToDo: "",
-      todo: [],
-    };
-    
-    this.getToDo = this.getToDo.bind(this);
-  }
+  const addToList = (event) => {
+    if (inputText !== "") {
+      setToDo([...todo, { id: Date.now(), value: inputText }]);
+    }
+    setInputText("");
+  };
 
-  getToDo(input) {
-    this.setState(
-      {
-        newToDo: input,
-      },
-      () => {
-        console.log(this.state.newToDo);
-      }
-    );
-    //this.state.todo.push(this.state.newToDo)
-    //console.log(this.state.todo)
-  }
-  render() {
-    return (
-      <div className="bg-light p-5 rounded-lg m-3">
-        <span className="display-4 ">To-Do</span>
-        <div className="input-group mb-3">
-          <input
-            onChange={(e) => this.getToDo(e.target.value)}
-            value={this.state.todo}
-            type="text"
-            className="form-control"
-            placeholder="Please enter your ToDo"
-            autoComplete="false"
-            required
-          />
-          <button
-            className="btn btn-outline-success"
-            type="button"
-            id="button-addon2"
-          >
-            Add
-          </button>
-        </div>
-        <ul className="list-group">
-          <li className="list-group-item d-flex justify-content-between align-items-center">
-            Here Comes first ToDo
-            <button className="btn btn-outline-danger">Delete</button>
-          </li>
-          <li className="list-group-item d-flex justify-content-between align-items-center">
-            Here Comes second ToDo
-            <button className="btn btn-outline-danger">Delete</button>
-          </li>
-        </ul>
-      </div>
-    );
-  }
-}
+  const deleteEvent = (event) => {
+    //setToDo(todo.filter((item) => item.id !== event));
+    const updatedToDo = todo.filter((item) => item.id !== event);
+    setToDo(updatedToDo);
+  };
+  return (
+    <div className="bg-light p-5 rounded-lg m-3">
+      <span className="display-4 ">To-Do</span>
+      <ToDoInput
+        setInputTextHandler={(e) => setInputText(e.target.value)}
+        addToListHandler={addToList}
+        valueHandler={inputText}
+      />
+      {todo.map((todo) => (
+        <ToDoList item={todo.value} key={todo.id} deleteEventHandler={() => deleteEvent(todo.id)} />
+      ))}
+    </div>
+  );
+};
 
 export default ToDo;
