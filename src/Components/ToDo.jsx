@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ToDoList from "./ToDoList";
 import ToDoInput from "./ToDoInput";
+import { createAPIEndpoint, ENDPOINTS } from "../api";
 
 const ToDo = (props) => {
   const [inputText, setInputText] = useState("");
@@ -10,6 +11,9 @@ const ToDo = (props) => {
     if (inputText !== "") {
       setToDo([...todo, { id: Date.now(), value: inputText }]);
     }
+    // console.log(todo)
+    // createAPIEndpoint(ENDPOINTS.ToDoModels).post(inputText)
+    // .then(res => console.log(res)).catch(err => console.log(err))
     setInputText("");
   };
 
@@ -17,6 +21,10 @@ const ToDo = (props) => {
     //setToDo(todo.filter((item) => item.id !== event));
     const updatedToDo = todo.filter((item) => item.id !== event);
     setToDo(updatedToDo);
+  };
+  const editEvnetHandler = (event) => {
+    setInputText(event.value);
+    setToDo(todo.filter((item) => item.id !== event.id));
   };
   return (
     <div className="bg-light p-5 rounded-lg m-3">
@@ -27,7 +35,12 @@ const ToDo = (props) => {
         valueHandler={inputText}
       />
       {todo.map((todo) => (
-        <ToDoList item={todo.value} key={todo.id} deleteEventHandler={() => deleteEvent(todo.id)} />
+        <ToDoList
+          item={todo.value}
+          key={todo.id}
+          deleteEventHandler={() => deleteEvent(todo.id)}
+          editEvnetHandler={() => editEvnetHandler(todo)}
+        />
       ))}
     </div>
   );
