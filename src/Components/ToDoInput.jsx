@@ -2,13 +2,13 @@ import React from "react";
 
 const ToDoInput = ({ setInputTextHandler, addToListHandler, valueHandler }) => {
   return (
-    <div className="input-group mb-3">
+    <div className="input-group">
       <input
         onChange={setInputTextHandler}
         value={valueHandler}
         type="text"
         className="form-control"
-        placeholder="Please enter your ToDo"
+        placeholder="Please add your ToDo"
         autoComplete="false"
         required
       />
