@@ -4,6 +4,7 @@ import ToDoInput from "./ToDoInput";
 import { createAPIEndpoint, ENDPOINTS } from "../api";
 import ToDoSearct from "./ToDoSearch";
 import ToDoFilter from "./ToDoFilter";
+import { GET, POST, DELETE } from "../api/httpHelper";
 
 const ToDo = (props) => {
   const [inputText, setInputText] = useState("");
@@ -11,45 +12,78 @@ const ToDo = (props) => {
   const [searchResult, setSearchResult] = useState([]);
   const inputSearchText = useRef("");
   let noToDos;
-
-  // createAPIEndpoint(ENDPOINTS.ToDoModels)
-  //   .fetch()
-  //   .then((res) => console.log(res.data))
-  //   .catch((err) => console.log(err));
+  const url = "http://localhost:5131/api/ToDoModels";
 
   if (todos.length < 1) {
     noToDos = <span> There are no ToDo's Added</span>;
   }
 
   const addToList = (event) => {
-    var num = 23294828;
-    
-    if (inputText !== "") {
-      setToDo([...todos, { id: Math.floor(Math.random()*num) + 1, todo: inputText }]);
-    }
-    
+    const num = 23294828;
+    if (inputText !== "")
+      setToDo([
+        ...todos,
+        {
+          id: Math.floor(Math.random() * num) + 1,
+          todo: inputText,
+          isChecked: false,
+        },
+      ]);
     setInputText("");
   };
+
+  const retriveTodos = async () => {
+    const respo = await GET(url);
+    return respo;
+
+    /* getting the data using AXIOS */
+    // const response = await createAPIEndpoint(ENDPOINTS.ToDoModels).fetch();
+    // return response.data;
+  };
+
   useEffect(() => {
-    var id = (todos.map(item => item.id )).slice(-1)
-    var todo = (todos.map(item => item.todo )).slice(-1).toString()
-    if(todo !== ""){
-      createAPIEndpoint(ENDPOINTS.ToDoModels)
-      .post({id: id[0], todo: todo})
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
-    }
-  },[todos])
+    const getAllToDos = async () => {
+      const allToDos = await retriveTodos();
+      if (allToDos) setToDo(allToDos);
+    };
+    getAllToDos();
+  }, []);
+
+  const postTodos = async (id, todo) => {
+    let data = { id, todo };
+    POST(url, data);
+
+    /* Posting the data using AXIOS */
+    // createAPIEndpoint(ENDPOINTS.ToDoModels)
+    //   .post({ id: id, todo: todo })
+    //   .then((res) => console.log(res))
+    //   .catch((err) => err);
+  };
+
+  useEffect(() => {
+    const postToDo = async () => {
+      var id = todos.map((item) => item.id).slice(-1);
+      var todo = todos
+        .map((item) => item.todo)
+        .slice(-1)
+        .toString();
+      await postTodos(id[0], todo);
+    };
+    postToDo();
+  }, [todos]);
 
   const deleteEvent = (event) => {
     //setToDo(todo.filter((item) => item.id !== event));
     const updatedToDo = todos.filter((item) => item.id !== event);
     setToDo(updatedToDo);
-    let id = event;
-    //console.log(id)
 
-    createAPIEndpoint(ENDPOINTS.ToDoModels).delete(id)
-    .then(res => console.log(res)).catch(err => console.log(err))
+    let id = event;
+    DELETE(url, id);
+    /* deleting the records using AXIOS */
+    // createAPIEndpoint(ENDPOINTS.ToDoModels)
+    //   .delete(id)
+    //   .then((res) => console.log(res))
+    //   .catch((err) => console.log(err));
   };
 
   const editEvnetHandler = (event) => {
@@ -65,12 +99,12 @@ const ToDo = (props) => {
           .toLowerCase()
           .includes(inputSearchText.current.value.toLowerCase());
       });
-      //console.log(searchedToDo)
       setSearchResult(searchedToDo);
     } else {
       setSearchResult(todos);
     }
   };
+
   return (
     <div className="bg-light p-5 rounded-lg m-3">
       <span className="display-4 ">To-Do</span>
@@ -84,17 +118,24 @@ const ToDo = (props) => {
           setSearchTextHandler={setSearchTextHandler}
           inputSearchText={inputSearchText}
         ></ToDoSearct>
-        <ToDoFilter></ToDoFilter>
+        {/* <ToDoFilter></ToDoFilter> */}
       </div>
       <div>{noToDos}</div>
-      {todos.map((todo) => (
-        <ToDoList
-          item={todo.todo}
-          key={todo.id}
-          deleteEventHandler={() => deleteEvent(todo.id)}
-          editEvnetHandler={() => editEvnetHandler(todo)}
-        />
-      ))}
+      {inputSearchText.current.value
+        ? searchResult.map((todo) => (
+            <ToDoList
+              item={todo.todo}
+              key={todo.id}
+            />
+          ))
+        : todos.map((todo) => (
+            <ToDoList
+              item={todo.todo}
+              key={todo.id}
+              deleteEventHandler={() => deleteEvent(todo.id)}
+              editEvnetHandler={() => editEvnetHandler(todo)}
+            />
+          ))}
     </div>
   );
 };
