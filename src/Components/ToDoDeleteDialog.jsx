@@ -2,8 +2,7 @@ import React from "react";
 import Modal from "react-modal";
 import "../index.css";
 
-const ToDoDeleteDialog = ({isOpen, dialogResponse, setIsOpen}) => {
-
+const ToDoDeleteDialog = ({ isOpen, dialogResponse, setIsOpen }) => {
   return (
     <React.Fragment>
       <div className="App">
@@ -17,8 +16,12 @@ const ToDoDeleteDialog = ({isOpen, dialogResponse, setIsOpen}) => {
         >
           <div className="msgText">Are You Sure!.</div>
           <div className="btnContainer">
-          <button className="btnYes" onClick={dialogResponse}>Yes</button>
-          <button className="btnNo"onClick={() => setIsOpen(false)}>No</button>
+            <button className="btnYes" onClick={dialogResponse}>
+              Yes
+            </button>
+            <button className="btnNo" onClick={() => setIsOpen(false)}>
+              No
+            </button>
           </div>
         </Modal>
       </div>
@@ -26,4 +29,4 @@ const ToDoDeleteDialog = ({isOpen, dialogResponse, setIsOpen}) => {
   );
 };
 
-export default ToDoDeleteDialog
+export default ToDoDeleteDialog;
