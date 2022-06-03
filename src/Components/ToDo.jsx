@@ -5,11 +5,13 @@ import { createAPIEndpoint, ENDPOINTS } from "../api";
 import ToDoSearct from "./ToDoSearch";
 import ToDoFilter from "./ToDoFilter";
 import { GET, POST, DELETE } from "../api/httpHelper";
+import ToDoDeleteDialog from "./ToDoDeleteDialog";
 
 const ToDo = (props) => {
   const [inputText, setInputText] = useState("");
   const [todos, setToDo] = useState([]);
   const [searchResult, setSearchResult] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
   const inputSearchText = useRef("");
   let noToDos;
   const url = "http://localhost:5131/api/ToDoModels";
@@ -40,7 +42,6 @@ const ToDo = (props) => {
     // const response = await createAPIEndpoint(ENDPOINTS.ToDoModels).fetch();
     // return response.data;
   };
-
   useEffect(() => {
     const getAllToDos = async () => {
       const allToDos = await retriveTodos();
@@ -72,11 +73,11 @@ const ToDo = (props) => {
     postToDo();
   }, [todos]);
 
-  const deleteEvent = (event) => {
+  const dialogResponse = (event) => {
+    setIsOpen(!isOpen);
     //setToDo(todo.filter((item) => item.id !== event));
     const updatedToDo = todos.filter((item) => item.id !== event);
     setToDo(updatedToDo);
-
     let id = event;
     DELETE(url, id);
     /* deleting the records using AXIOS */
@@ -84,6 +85,10 @@ const ToDo = (props) => {
     //   .delete(id)
     //   .then((res) => console.log(res))
     //   .catch((err) => console.log(err));
+  };
+
+  const deleteEvent = async (event) => {
+    setIsOpen(!isOpen);
   };
 
   const editEvnetHandler = (event) => {
@@ -123,18 +128,25 @@ const ToDo = (props) => {
       <div>{noToDos}</div>
       {inputSearchText.current.value
         ? searchResult.map((todo) => (
-            <ToDoList
-              item={todo.todo}
-              key={todo.id}
-            />
+            <ToDoList item={todo.todo} key={todo.id} />
           ))
         : todos.map((todo) => (
-            <ToDoList
-              item={todo.todo}
-              key={todo.id}
-              deleteEventHandler={() => deleteEvent(todo.id)}
-              editEvnetHandler={() => editEvnetHandler(todo)}
-            />
+            <React.Fragment key={todo.id}>
+              <ToDoList
+                item={todo.todo}
+                deleteEventHandler={() => deleteEvent(todo.id)}
+                editEvnetHandler={() => editEvnetHandler(todo)}
+              />
+              {isOpen ? (
+                <ToDoDeleteDialog
+                  isOpen={isOpen}
+                  dialogResponse={() => dialogResponse(todo.id)}
+                  setIsOpen={setIsOpen}
+                />
+              ) : (
+                ""
+              )}
+            </React.Fragment>
           ))}
     </div>
   );
