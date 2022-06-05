@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import ToDoList from "./ToDoList";
 import ToDoInput from "./ToDoInput";
 import { createAPIEndpoint, ENDPOINTS } from "../api";
-import ToDoSearct from "./ToDoSearch";
+import ToDoSearch from "./ToDoSearch";
 import ToDoFilter from "./ToDoFilter";
 import { GET, POST, DELETE } from "../api/httpHelper";
 import ToDoDeleteDialog from "./ToDoDeleteDialog";
@@ -20,20 +20,6 @@ const ToDo = (props) => {
     noToDos = <span> There are no ToDo's Added</span>;
   }
 
-  const addToList = (event) => {
-    const num = 23294828;
-    if (inputText !== "")
-      setToDo([
-        ...todos,
-        {
-          id: Math.floor(Math.random() * num) + 1,
-          todo: inputText,
-          isChecked: false,
-        },
-      ]);
-    setInputText("");
-  };
-
   const retriveTodos = async () => {
     const respo = await GET(url);
     return respo;
@@ -42,17 +28,18 @@ const ToDo = (props) => {
     // const response = await createAPIEndpoint(ENDPOINTS.ToDoModels).fetch();
     // return response.data;
   };
+
   useEffect(() => {
     const getAllToDos = async () => {
       const allToDos = await retriveTodos();
       if (allToDos) setToDo(allToDos);
     };
-    getAllToDos();
+    //getAllToDos();
   }, []);
 
   const postTodos = async (id, todo) => {
     let data = { id, todo };
-    POST(url, data);
+    //POST(url, data);
 
     /* Posting the data using AXIOS */
     // createAPIEndpoint(ENDPOINTS.ToDoModels)
@@ -79,7 +66,7 @@ const ToDo = (props) => {
     const updatedToDo = todos.filter((item) => item.id !== event);
     setToDo(updatedToDo);
     let id = event;
-    DELETE(url, id);
+    //DELETE(url, id);
     /* deleting the records using AXIOS */
     // createAPIEndpoint(ENDPOINTS.ToDoModels)
     //   .delete(id)
@@ -87,55 +74,36 @@ const ToDo = (props) => {
     //   .catch((err) => console.log(err));
   };
 
-  const deleteEvent = async (event) => {
-    setIsOpen(!isOpen);
-  };
-
-  const editEvnetHandler = (event) => {
-    setInputText(event.todo);
-    setToDo(todos.filter((item) => item.id !== event.id));
-  };
-
-  const setSearchTextHandler = (event) => {
-    if (inputSearchText.current.value !== "") {
-      const searchedToDo = todos.filter((item) => {
-        return Object.values(item)
-          .join(" ")
-          .toLowerCase()
-          .includes(inputSearchText.current.value.toLowerCase());
-      });
-      setSearchResult(searchedToDo);
-    } else {
-      setSearchResult(todos);
-    }
-  };
-
   return (
     <div className="bg-light p-5 rounded-lg m-3">
       <span className="display-4 ">To-Do</span>
       <ToDoInput
-        setInputTextHandler={(e) => setInputText(e.target.value)}
-        addToListHandler={addToList}
-        valueHandler={inputText}
+        setInputText={setInputText}
+        inputText={inputText}
+        todos={todos}
+        setToDo={setToDo}
       />
       <div className="input-group mb-3 pt-3">
-        <ToDoSearct
-          setSearchTextHandler={setSearchTextHandler}
+        <ToDoSearch
           inputSearchText={inputSearchText}
-        ></ToDoSearct>
-        {/* <ToDoFilter></ToDoFilter> */}
+          todos={todos}
+          setSearchResult={setSearchResult}
+        ></ToDoSearch>
+        <ToDoFilter todos={todos}></ToDoFilter>
       </div>
       <div>{noToDos}</div>
       {inputSearchText.current.value
-        ? searchResult.map((todo) => (
-            <ToDoList item={todo.todo} key={todo.id} />
-          ))
+        ? searchResult.map((todo) => <ToDoList item={todo} key={todo.id} />)
         : todos.map((todo) => (
             <React.Fragment key={todo.id}>
               <ToDoList
-                item={todo.todo}
-                deleteEventHandler={() => deleteEvent(todo.id)}
-                editEvnetHandler={() => editEvnetHandler(todo)}
+                item={todo}
+                todo={todo}
+                todos={todos}
+                setToDo={setToDo}
+                setInputText={setInputText}
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
               />
               {isOpen ? (
                 <ToDoDeleteDialog

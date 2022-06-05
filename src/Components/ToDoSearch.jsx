@@ -1,6 +1,20 @@
 import React from "react";
 
-const ToDoSearct = ({ setSearchTextHandler, inputSearchText }) => {
+const ToDoSearch = ({ inputSearchText, todos, setSearchResult }) => {
+  const setSearchTextHandler = (event) => {
+    if (inputSearchText.current.value !== "") {
+      const searchedToDo = todos.filter((item) => {
+        return Object.values(item)
+          .join(" ")
+          .toLowerCase()
+          .includes(inputSearchText.current.value.toLowerCase());
+      });
+      setSearchResult(searchedToDo);
+    } else {
+      setSearchResult(todos);
+    }
+  };
+
   return (
     <React.Fragment>
       <input
@@ -14,4 +28,4 @@ const ToDoSearct = ({ setSearchTextHandler, inputSearchText }) => {
   );
 };
 
-export default ToDoSearct;
+export default ToDoSearch;
